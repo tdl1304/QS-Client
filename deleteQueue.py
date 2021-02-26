@@ -34,6 +34,13 @@ if res.status_code != 200:
     exit(0)
 headers['Cookie'] = res.headers["Set-Cookie"]
 
+for element in requests.post(url="https://qs.stud.iie.ntnu.no/res/studentSubjects", data=None, headers=headers).json():
+    if element['subjectActive'] != 0:
+        print("Id:", element['subjectID'], element['subjectCode'], element['subjectName'],
+              "(Active)" if element['subjectQueueStatus'] == 1 else "")
+
+subject_id = int(input('Enter subject ID: '))
+
 while True:
     queue = requests.request("POST", "https://qs.stud.iie.ntnu.no/res/getQueue", headers=headers, data=payloadQueue)
     not_prioritized = [element for element in queue.json() if not element['subjectPersonID'] in whitelist]
