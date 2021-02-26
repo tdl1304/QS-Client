@@ -13,11 +13,7 @@ actions = {
 }
 
 header = {
-    'Host': 'qs.stud.iie.ntnu.no',
-    'Origin': 'https://qs.stud.iie.ntnu.no',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
-    'Referer': 'https://qs.stud.iie.ntnu.no/student',
-    'Accept-Language': 'nb-NO,nb;q=0.8,no;q=0.6,nn;q=0.4,en-US;q=0.2,en;q=0.2,da;q=0.2'
+    'Content-Type': 'application/json'
 }
 
 qs_api = 'https://qs.stud.iie.ntnu.no/'
@@ -46,7 +42,8 @@ else:
             json.dump({"email": username, "password": passwd}, outfile)
     print("Username and passwd saved to qs.psw")
 
-res = req(actions['login']['url'], {"email": username, "password": passwd}, header, actions['login']['method'])
+res = requests.post(url="https://qs.stud.iie.ntnu.no/loginForm", headers=header, data=
+"{\r\n    \"email\":\""+username+"\",\r\n    \"password\":\""+passwd+"\"\r\n}\r\n\r\n")
 if res.status_code != 200:
     print('Password and username is wrong, change or delete login file')
     input('Press exit to end program')
@@ -94,11 +91,14 @@ while subjectQueueStatus == 0:
             subjectQueueStatus = element['subjectQueueStatus']
             if subjectQueueStatus != 0:
                 break
-    time.sleep(3)
+    time.sleep(2)
 print("Queue open")
-queue_id = req(actionUrl=actions['addToQueue']['url'],
-               data={"subjectID": subject_id, "roomID": room_id, "desk": desk_id, "message": message, "help": help,
-                     "exercises": tasks},
-               headers=header,
-               method=actions['addToQueue']['method'])["queueElementID"]
-print("Added to queue", queue_id)
+
+payload = "{\r\n    \"subjectID\":\""+str(subject_id)+"\",\r\n    \"roomID\":\""+str(room_id)+"\",\r\n    \"desk\":\""+str(desk_id)+"\",\r\n    \"message\":\""+message+"\",\r\n    \"help\":"+str(help).lower()+",\r\n    \"exercises\":"+str(tasks)+"\r\n}"
+send = True
+while send:
+    response = requests.request("POST", "https://qs.stud.iie.ntnu.no/res/addQueueElement", headers=header, data=payload)
+    if response.status_code == 200:
+        send = False
+print("Added to queue", response.json()['queueElementID'])
+input('Press anything to exit')
