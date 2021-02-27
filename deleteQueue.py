@@ -27,7 +27,7 @@ else:
     print("Username and passwd saved to qs.psw")
 
 res = requests.post(url="https://qs.stud.iie.ntnu.no/loginForm", headers=headers, data=
-"{\r\n    \"email\":\""+username+"\",\r\n    \"password\":\""+passwd+"\"\r\n}\r\n\r\n")
+                    "{\r\n    \"email\":\""+username+"\",\r\n    \"password\":\""+passwd+"\"\r\n}\r\n\r\n")
 if res.status_code != 200:
     print('Password and username is wrong, change or delete login file')
     input('Press exit to end program')
@@ -48,5 +48,5 @@ while True:
         payload = "{\"queueElementID\": \"" + str(student['queueElementID']) + "\", \"subjectID\": \"185\"}"
         response = requests.request("POST", url, headers=headers, data=payload)
         print('deleted student:', student['personFirstName'], student['personLastName'])
-    time.sleep(10)
+    time.sleep(15)
     print("Trying to delete")

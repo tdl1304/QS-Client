@@ -43,7 +43,7 @@ else:
     print("Username and passwd saved to qs.psw")
 
 res = requests.post(url="https://qs.stud.iie.ntnu.no/loginForm", headers=header, data=
-"{\r\n    \"email\":\""+username+"\",\r\n    \"password\":\""+passwd+"\"\r\n}\r\n\r\n")
+                    "{\r\n    \"email\":\""+username+"\",\r\n    \"password\":\""+passwd+"\"\r\n}\r\n\r\n")
 if res.status_code != 200:
     print('Password and username is wrong, change or delete login file')
     input('Press exit to end program')
@@ -85,13 +85,11 @@ message = input("Message:")
 
 print("Waiting for queue")
 
-while subjectQueueStatus == 0:
+while subjectQueueStatus != 1:
     for element in req(actions['studentSubjects']['url'], None, header, actions['studentSubjects']['method']).json():
         if element['subjectID'] == subject_id:
             subjectQueueStatus = element['subjectQueueStatus']
-            if subjectQueueStatus != 0:
-                break
-    time.sleep(2)
+    time.sleep(3)
 print("Queue open")
 
 payload = "{\r\n    \"subjectID\":\""+str(subject_id)+"\",\r\n    \"roomID\":\""+str(room_id)+"\",\r\n    \"desk\":\""+str(desk_id)+"\",\r\n    \"message\":\""+message+"\",\r\n    \"help\":"+str(help).lower()+",\r\n    \"exercises\":"+str(tasks)+"\r\n}"
