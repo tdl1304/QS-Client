@@ -6,12 +6,13 @@ import time as time
 
 url = "https://qs.stud.iie.ntnu.no/res/deleteQueueElement"
 
-payloadQueue = "{\"subjectID\":\"185\"}"
+payloadQueue = {}
 headers = {
     'Accept': 'application/json, text/plain, */*',
     'Content-Type': 'application/json'
 }
-whitelist = [11068, 11060]
+whitelist = []
+#11068, 11060
 if Path("qs.psw").is_file():
     with open('qs.psw') as data_file:
         data_loaded = json.load(data_file)
@@ -39,14 +40,14 @@ for element in requests.post(url="https://qs.stud.iie.ntnu.no/res/studentSubject
         print("Id:", element['subjectID'], element['subjectCode'], element['subjectName'],
               "(Active)" if element['subjectQueueStatus'] == 1 else "")
 
-subject_id = int(input('Enter subject ID: '))
-
+subject_id = input('Enter subject ID: ')
+payloadQueue['subjectID'] = subject_id
 while True:
-    queue = requests.request("POST", "https://qs.stud.iie.ntnu.no/res/getQueue", headers=headers, data=payloadQueue)
+    queue = requests.request("POST", "https://qs.stud.iie.ntnu.no/res/getQueue", headers=headers, data=json.dumps(payloadQueue))
     not_prioritized = [element for element in queue.json() if not element['subjectPersonID'] in whitelist]
     for student in not_prioritized:
-        payload = "{\"queueElementID\": \"" + str(student['queueElementID']) + "\", \"subjectID\": \"185\"}"
+        payload = "{\"queueElementID\": \"" + str(student['queueElementID']) + "\", \"subjectID\": \""+subject_id+"\"}"
         response = requests.request("POST", url, headers=headers, data=payload)
-        print('deleted student:', student['personFirstName'], student['personLastName'])
+        print('Deleted student:', student['personFirstName'], student['personLastName'])
     time.sleep(15)
     print("Trying to delete")
